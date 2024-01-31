@@ -216,6 +216,35 @@ export const useSearch = (
                                 });
                                 matchIndex++;
                             }
+                            let nextPageText = '';
+                            if (pageIndex < numPages - 1) nextPageText = response[pageIndex + 1];
+                            const pageTextWithPrevAndNext = `${pageText}${nextPageText}`;
+                            while ((matches = keyword.regExp.exec(pageTextWithPrevAndNext)) !== null) {
+                                const startIndex = matches.index;
+                                const endIndex = keyword.regExp.lastIndex;
+
+                                startIndex - pageText.length
+                                // match crosses pages, otherwise it's a normal match and was already added
+                                if (endIndex > pageText.length) {
+                                    arr.push({
+                                        keyword: keyword.regExp,
+                                        matchIndex,
+                                        pageIndex,
+                                        pageText,
+                                        startIndex,
+                                        endIndex: pageText.length - 1,
+                                    });
+                                    arr.push({
+                                        keyword: keyword.regExp,
+                                        matchIndex,
+                                        pageIndex,
+                                        pageText,
+                                        startIndex: 0,
+                                        endIndex: endIndex - pageText.length,
+                                    });
+                                    matchIndex+=2;
+                                }
+                            }
                         });
                     }
                 });
